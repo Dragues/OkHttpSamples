@@ -10,29 +10,20 @@ import android.os.Bundle;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.HttpUrl;
@@ -40,6 +31,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -57,6 +49,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Observable.just("Hello, world!")
+                .map(s -> s + " -Dan")
+                .map(s -> s.hashCode())
+                .map(i -> Integer.toString(i))
+                .subscribe(s -> Log.d("RXTEST", s));
+
+        Observable.just(Arrays.asList("aaa", "bbb"))
+                .flatMap(urls -> Observable.from(urls))
+                .subscribe(url -> Log.d("RXTEST", url));
+
+        Observable.from(Arrays.asList("url1", "url2", "url3"))
+                .subscribe(url -> Log.d("RXTEST", url));
+
+
+
+        Observable.just(Arrays.asList("Hello", "AAAA"))
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+        .flatMap(stringList-> Observable.from(stringList))
+        .subscribe(stringItem -> Log.d("RXTEST", stringItem));// from
+
+
+
 
         mImageView = (ImageView) findViewById(R.id.image_view);
         HttpUrl.Builder urlBuilder
@@ -178,4 +194,6 @@ public class MainActivity extends AppCompatActivity {
             bmImage.setImageBitmap(result);
         }
     }
+
+
 }
